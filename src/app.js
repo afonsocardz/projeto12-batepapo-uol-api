@@ -3,7 +3,7 @@ import { MongoClient } from "mongodb";
 import cors from "cors";
 import dotenv from "dotenv";
 
-import {getParticipants} from "./controllers/participants-controller.js";
+import {postParticipants, getParticipants} from "./controllers/participants-controller.js";
 
 dotenv.config();
 const port = process.env.SERVER_PORT;
@@ -14,9 +14,11 @@ app.use(json());
 app.use(cors());
 
 app.post("/participants", (req, res) => {
+    postParticipants(req,res,db);
+});
+app.get("/participants", (req, res) => {
     getParticipants(req,res,db);
 });
-//app.post("/participants", postParticipants);
 //app.get("/messages", getMessages);
 //app.post("/messages", postMessages);
 //app.post("/status", postStatus);
