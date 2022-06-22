@@ -13,6 +13,6 @@ export const Message = Joi.object({
     type: Joi.string()
         .required(),
     
-    time: Joi.date()
-        .timestamp(),
+    time: Joi.string()
+        .required(),
 });

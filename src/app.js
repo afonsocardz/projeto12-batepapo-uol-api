@@ -20,7 +20,7 @@ app.get("/participants", (req, res) => {
     getParticipants(req,res,db);
 });
 //app.get("/messages", getMessages);
-//app.post("/messages", postMessages);
+app.post("/messages", (req, res) => postMessages(req, res, db));
 //app.post("/status", postStatus);
 
 
