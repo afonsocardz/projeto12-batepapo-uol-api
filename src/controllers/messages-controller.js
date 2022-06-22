@@ -14,5 +14,15 @@ function postMessage(req, res, db){
 }
 
 function getMessages (req, res, db) {
-    
+    let limit = 0;
+    if (req.query.limit){
+        const limit = req.query.limit
+    }
+    db.collection("messages").find().sort({$natural:-1}).limit(limit).toArray.then(messages => {
+        
+
+
+    })
 }
+
+export {postMessage, getMessages};
