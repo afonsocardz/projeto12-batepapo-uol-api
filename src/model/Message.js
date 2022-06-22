@@ -1,4 +1,4 @@
-import Joi, { required } from "joi";
+import Joi from "joi";
 
 export const Message = Joi.object({
     from: Joi.string()

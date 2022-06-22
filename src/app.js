@@ -4,6 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 import {postParticipants, getParticipants} from "./controllers/participants-controller.js";
+import {postMessage, getMessages} from "./controllers/messages-controller.js";
 
 dotenv.config();
 const port = process.env.SERVER_PORT;
@@ -19,8 +20,8 @@ app.post("/participants", (req, res) => {
 app.get("/participants", (req, res) => {
     getParticipants(req,res,db);
 });
-//app.get("/messages", getMessages);
-app.post("/messages", (req, res) => postMessages(req, res, db));
+app.get("/messages", (req, res) => getMessages(req, res, db));
+app.post("/messages", (req, res) => postMessage(req, res, db));
 //app.post("/status", postStatus);
 
 
