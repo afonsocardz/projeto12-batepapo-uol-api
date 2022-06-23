@@ -22,7 +22,7 @@ app.post("/messages", (req, res) => postMessage(req, res, db));
 
 app.post("/status", (req, res) => postStatus(req, res, db));
 
-setInterval(() => removeIdle(db), 10000);
+setInterval(() => removeIdle(db), 15000);
 
 const client = new MongoClient("mongodb://127.0.0.1:27017/");
 let db;
