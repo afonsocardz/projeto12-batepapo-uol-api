@@ -37,9 +37,30 @@ async function postStatus(req, res, db) {
     }
 }
 
+async function removeIdle(db) {
+    try {
+        const participants = await db.collection("participants").find().toArray();
+        participants.map(async participant => {
+            if (Date.now() - participant.lastStatus > 10000) {
+                const message = {
+                    from: participant.name,
+                    to: 'Todos',
+                    text: 'sai da sala...',
+                    type: 'status',
+                    time: dayjs().format("HH:mm:ss")
+                }
+                await db.collection("participants").deleteOne({ name: participant.name });
+                await db.collection("messages").insertOne(message);
+            }
+        });
+    } catch (err) {
+        console.log(err);
+    }
+}
+
 async function getParticipants(req, res, db) {
     const participants = await db.collection("participants").find().toArray();
     res.status(200).send(participants);
 }
 
-export { postParticipants, getParticipants, postStatus };
+export { postParticipants, getParticipants, postStatus, removeIdle };
