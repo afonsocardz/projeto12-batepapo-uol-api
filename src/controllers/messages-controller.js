@@ -2,9 +2,15 @@ import {Message} from "../model/Message.js";
 import dayjs from "dayjs";
 
 function postMessage(req, res, db){
-    const message = {...req.body, from: req.headers.user, time: dayjs().format("HH:mm:ss")};
+    const message = {
+        ...req.body, 
+        from: req.headers.user, 
+        time: dayjs().format("HH:mm:ss")
+    };
+
     const {value, error } = Message.validate(message);
     const valid = error == null;
+    
     if (!valid) {
         res.status(422).send(error.details);
     } else {
@@ -13,14 +19,14 @@ function postMessage(req, res, db){
     }
 }
 
-function getMessages (req, res, db) {
+async function getMessages (req, res, db) {
     let limit = 0;
     if (req.query.limit){
-        limit = req.query.limit
+        limit = parseInt(req.query.limit);
     }
-    db.collection("messages").find().sort({$natural:-1}).limit(limit).toArray().then(messages => {
-        res.send(messages);
-    })
+    const messages = await db.collection("messages").find().sort({$natural:1}).limit(limit).toArray();
+    const filteredMgs = await messages.filter(message => message.to === "Todos" || message.to === req.headers.user);
+    res.send(filteredMgs);
 }
 
 export {postMessage, getMessages};

@@ -24,10 +24,22 @@ function postParticipants(req, res, db) {
     }
 };
 
-function getParticipants(req, res, db) {
-    db.collection("participants").find().toArray().then(participants => {
-        res.send(participants);
-    });
+async function postStatus(req, res, db) {
+    const { user } = req.headers;
+    try {
+        await db.collection("participants").find({ name: user });
+        await db.collection("participants").updateOne({ name: user },
+            { $set: { lastStatus: Date.now() } });
+        res.sendStatus(200);
+    } catch (err) {
+        console.log(err);
+        res.sendStatus(404);
+    }
 }
 
-export { postParticipants, getParticipants };
+async function getParticipants(req, res, db) {
+    const participants = await db.collection("participants").find().toArray();
+    res.status(200).send(participants);
+}
+
+export { postParticipants, getParticipants, postStatus };
