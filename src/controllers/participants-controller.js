@@ -1,7 +1,7 @@
 import { Participant } from "../model/Participant.js";
 import dayjs from "dayjs";
 
-function postParticipants(req, res, db) {
+async function postParticipants(req, res, db) {
     const participant = {
         name: req.body.name,
         lastStatus: Date.now()
@@ -17,11 +17,19 @@ function postParticipants(req, res, db) {
     const valid = error == null;
     if (!valid) {
         res.status(422).send(error.details);
-    } else {
+        return;
+    }
+
+    const isUnvaiable = await db.collection("participants").findOne({name: req.body.name});
+    
+    if(!isUnvaiable){
         db.collection("participants").insertOne(value);
         db.collection("messages").insertOne(loginMessage);
         res.sendStatus(201);
+    } else {
+        res.sendStatus(409)
     }
+    
 };
 
 async function postStatus(req, res, db) {
