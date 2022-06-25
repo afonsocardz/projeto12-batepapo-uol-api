@@ -3,12 +3,13 @@ import { MongoClient } from "mongodb";
 import cors from "cors";
 import dotenv from "dotenv";
 
-import { postParticipants, getParticipants, postStatus, removeIdle } from "./controllers/participants-controller.js";
-import { postMessage, getMessages } from "./controllers/messages-controller.js";
+import { postParticipants, getParticipants, postStatus, removeIdle } from "./src/controllers/participants-controller.js";
+import { postMessage, getMessages } from "./src/controllers/messages-controller.js";
 
 dotenv.config();
-const port = process.env.SERVER_PORT;
-const mongoURI = process.env.MONGO_URI;
+const PORT = process.env.SERVER_PORT;
+const MONGO_URI = process.env.MONGODB_URI;
+const IDLE_REMOVE_TIME = process.env.IDLE_REMOVE_TIME;
 
 const app = express();
 app.use(json());
@@ -22,14 +23,18 @@ app.post("/messages", (req, res) => postMessage(req, res, db));
 
 app.post("/status", (req, res) => postStatus(req, res, db));
 
-setInterval(() => removeIdle(db), 15000);
+setInterval(() => removeIdle(db), IDLE_REMOVE_TIME);
 
-const client = new MongoClient("mongodb://127.0.0.1:27017/");
+const client = new MongoClient("mongodb://" + MONGO_URI);
 let db;
 
-client.connect().then(() => {
+async function start() {
+    await client.connect();
     db = client.db("batepapouol");
-});
+    app.listen(PORT);
+}
 
-app.listen(5000)
+start();
+
+
 

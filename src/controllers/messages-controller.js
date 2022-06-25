@@ -24,9 +24,9 @@ async function getMessages (req, res, db) {
     if (req.query.limit){
         limit = parseInt(req.query.limit);
     }
-    const messages = await db.collection("messages").find().sort({$natural:1}).limit(limit).toArray();
+    const messages = await db.collection("messages").find().limit(limit).sort({$natural:-1}).toArray();
     const filteredMgs = await messages.filter(message => message.to === "Todos" || message.to === req.headers.user || message.from === req.headers.user);
-    res.send(filteredMgs);
+    res.send(filteredMgs.reverse());
 }
 
 export {postMessage, getMessages};

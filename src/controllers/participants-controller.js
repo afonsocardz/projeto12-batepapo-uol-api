@@ -20,16 +20,18 @@ async function postParticipants(req, res, db) {
         return;
     }
 
-    const isUnvaiable = await db.collection("participants").findOne({name: req.body.name});
-    
-    if(!isUnvaiable){
-        db.collection("participants").insertOne(value);
-        db.collection("messages").insertOne(loginMessage);
-        res.sendStatus(201);
-    } else {
-        res.sendStatus(409)
+    try {
+        const isUnvaiable = await db.collection("participants").findOne({ name: req.body.name });
+        if (!isUnvaiable) {
+            db.collection("participants").insertOne(value);
+            db.collection("messages").insertOne(loginMessage);
+            res.sendStatus(201);
+        } else {
+            res.sendStatus(409)
+        }
+    } catch (err) {
+        console.log(err);
     }
-    
 };
 
 async function postStatus(req, res, db) {
@@ -48,19 +50,27 @@ async function postStatus(req, res, db) {
 async function removeIdle(db) {
     try {
         const participants = await db.collection("participants").find().toArray();
-        participants.map(async participant => {
-            if (Date.now() - participant.lastStatus > 10000) {
-                const message = {
-                    from: participant.name,
-                    to: 'Todos',
-                    text: 'sai da sala...',
-                    type: 'status',
-                    time: dayjs().format("HH:mm:ss")
+
+        if (participants) {
+            participants.map(async participant => {
+                try {
+                    if (Date.now() - participant.lastStatus > 10000) {
+                        const message = {
+                            from: participant.name,
+                            to: 'Todos',
+                            text: 'sai da sala...',
+                            type: 'status',
+                            time: dayjs().format("HH:mm:ss")
+                        }
+                        await db.collection("participants").deleteOne({ name: participant.name });
+                        await db.collection("messages").insertOne(message);
+                        console.log("removi")
+                    }
+                } catch (err) {
+                    console.log(err);
                 }
-                await db.collection("participants").deleteOne({ name: participant.name });
-                await db.collection("messages").insertOne(message);
-            }
-        });
+            });
+        }
     } catch (err) {
         console.log(err);
     }
